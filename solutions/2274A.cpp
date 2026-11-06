@@ -1,3 +1,9 @@
+// Codeforces 2274A - The Projections of Paco
+// Rating: 800
+// Tags:   dfs and similar, dp, hashing, implementation, math
+// Link:   https://codeforces.com/problemset/problem/2274/A
+// Idea:   undo the reflections backwards: cur = 2*a[i] - cur, answer is cur/2
+
 #include <bits/stdc++.h>
 using namespace std;
 

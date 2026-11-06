@@ -1,3 +1,9 @@
+// Codeforces 2276A - Perfect Sandwiches
+// Rating: 800
+// Tags:   greedy, math
+// Link:   https://codeforces.com/problemset/problem/2276/A
+// Idea:   min(b, a-b): each sandwich needs 1 sausage and 1 extra cheese
+
 #include <bits/stdc++.h>
 using namespace std;
 

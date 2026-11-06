@@ -1,3 +1,9 @@
+// Codeforces 2275B - Did Not Go to Print
+// Rating: 800
+// Tags:   data structures, implementation
+// Link:   https://codeforces.com/problemset/problem/2275/B
+// Idea:   stack: each 2 cancels the most recent unmatched 1; 3s and unmatched 2s are marked; print the unmarked
+
 #include <bits/stdc++.h>
 using namespace std;
 
