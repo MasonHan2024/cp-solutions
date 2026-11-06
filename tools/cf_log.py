@@ -82,7 +82,10 @@ def main():
     if len(sys.argv) < 2:
         sys.exit('usage: ./ac.sh 2276A "key idea in one line"')
     pid = sys.argv[1]
-    idea = " ".join(sys.argv[2:]).strip()
+    rest = sys.argv[2:]
+    # optional: a .cpp filename anywhere after the id = the file to take the code from
+    src_arg = next((a for a in rest if a.endswith(".cpp")), None)
+    idea = " ".join(a for a in rest if a != src_arg).strip()
     m = re.fullmatch(r"(\d+)([A-Za-z]\d?)", pid)
     if not m:
         sys.exit(f"'{pid}' doesn't look like a problem id (expected e.g. 2276A or 1850B1)")
@@ -96,12 +99,15 @@ def main():
     best = accepted or subs[0]
     p = best["problem"]
 
-    src = ROOT / f"{pid}.cpp"
+    src = ROOT / (src_arg or f"{pid}.cpp")
     dst = SOL_DIR / f"{pid}.cpp"
     SOL_DIR.mkdir(exist_ok=True)
+    if src_arg and not src.exists():
+        sys.exit(f"{src_arg} not found in {ROOT}")
     if src.exists():
         shutil.move(str(src), dst)
-        for extra in (ROOT / f"{pid}.in", ROOT / pid):
+        stem = src.stem
+        for extra in (ROOT / f"{stem}.in", ROOT / stem):
             if extra.exists():
                 extra.unlink()
 
