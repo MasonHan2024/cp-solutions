@@ -1,0 +1,11 @@
+# ignore everything (compiled binaries, .in files)...
+*
+# ...except folders, source, scripts and docs
+!*/
+!*.cpp
+!*.sh
+!*.py
+!*.md
+!*.jsonl
+!.gitignore
+!.clang-tidy

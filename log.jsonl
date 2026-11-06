@@ -1,0 +1,1 @@
+{"pid": "2276A", "contest": 2276, "index": "A", "name": "Perfect Sandwiches", "rating": 800, "tags": ["greedy", "math"], "verdict": "OK", "tries": 1, "sub_id": 397535668, "idea": "min(b, a-b): each sandwich needs 1 sausage and 1 extra cheese", "date": "2026-11-06", "has_code": true}
