@@ -60,8 +60,10 @@ def build_readme(entries):
         "",
         f"**Solved:** {len(solved)}  |  **By rating:** {ratings or '—'}",
         "",
-        "| Date | Problem | Rating | Result | Tries | Key idea | Code |",
-        "|---|---|---|---|---|---|---|",
+        f"**By tag:** {tag_counts(solved) or '—'}",
+        "",
+        "| Date | Problem | Rating | Tags | Result | Tries | Key idea | Code |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for e in sorted(entries, key=lambda e: e["date"], reverse=True):
         c, i = e["contest"], e["index"]
@@ -69,9 +71,37 @@ def build_readme(entries):
         res = f"[{VERDICT.get(e['verdict'], e['verdict'])}](https://codeforces.com/contest/{c}/submission/{e['sub_id']})"
         code = f"[cpp](solutions/{e['pid']}.cpp)" if e.get("has_code") else "—"
         idea = (e.get("idea") or "").replace("|", "\\|")
-        lines.append(f"| {e['date']} | {prob} | {e.get('rating') or '?'} | {res} | {e['tries']} | {idea} | {code} |")
+        tags = ", ".join(f"`{t}`" for t in e.get("tags", [])) or "—"
+        lines.append(f"| {e['date']} | {prob} | {e.get('rating') or '?'} | {tags} | {res} | {e['tries']} | {idea} | {code} |")
     lines += ["", "Workflow: `./new.sh 2276A` → code → `./run.sh 2276A` → submit → `./ac.sh 2276A \"idea\"`.", ""]
     (ROOT / "README.md").write_text("\n".join(lines))
+
+
+def tag_counts(solved):
+    counts = {}
+    for e in solved:
+        for t in e.get("tags", []):
+            counts[t] = counts.get(t, 0) + 1
+    return " · ".join(f"{t}: {n}" for t, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
+HEADER_MARK = "// Codeforces "
+
+
+def add_header(path, e):
+    """Put a comment block with name, rating, tags, link and idea at the top of the solution."""
+    code = path.read_text()
+    if code.startswith(HEADER_MARK):  # replace an old header
+        code = code.split("\n\n", 1)[1] if "\n\n" in code else code
+    header = [
+        f"{HEADER_MARK}{e['pid']} - {e['name']}",
+        f"// Rating: {e.get('rating') or '?'}",
+        f"// Tags:   {', '.join(e.get('tags', [])) or '-'}",
+        f"// Link:   https://codeforces.com/problemset/problem/{e['contest']}/{e['index']}",
+    ]
+    if e.get("idea"):
+        header.append(f"// Idea:   {e['idea']}")
+    path.write_text("\n".join(header) + "\n\n" + code)
 
 
 def git(*args):
@@ -118,6 +148,8 @@ def main():
         "sub_id": best["id"], "idea": idea,
         "date": datetime.date.today().isoformat(), "has_code": dst.exists(),
     }
+    if dst.exists():
+        add_header(dst, entry)
     entries = [e for e in load_log() if e["pid"] != pid] + [entry]
     save_log(entries)
     build_readme(entries)
@@ -129,10 +161,12 @@ def main():
         print("Logged locally (no git repo yet).")
         return
     git("add", "-A")
-    msg = f"{pid} {entry['name']} ({VERDICT.get(entry['verdict'], entry['verdict'])})"
+    msg = (f"{pid} {entry['name']} [{entry['rating'] or '?'}] "
+           f"({VERDICT.get(entry['verdict'], entry['verdict'])})")
     if idea:
         msg += f": {idea}"
-    r = git("commit", "-m", msg)
+    body = "Tags: " + (", ".join(entry["tags"]) or "-")
+    r = git("commit", "-m", msg, "-m", body)
     if r.returncode != 0:
         print(r.stdout.strip() or r.stderr.strip())
         return
