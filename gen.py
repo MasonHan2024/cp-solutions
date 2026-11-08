@@ -1,10 +1,6 @@
-tests = []
-budget = SUM_N
-while budget >= 2:
-    n = 2 * random.randint(1, min(5, budget // 2))   # small even n
-    budget -= n
-    tests.append(n)
-print(len(tests))
-for n in tests:
-    print(n, random.randint(1, n))
-    print(*[random.randint(0, n) for _ in range(n)])    
+import random, sys
+random.seed(int(sys.argv[1]))
+n = random.randint(2, 50)          # check the statement's minimum n
+print(1)
+print(n)
+print(*[random.randint(-5, 5) for _ in range(n)])
