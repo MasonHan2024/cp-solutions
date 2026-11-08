@@ -1,59 +1,53 @@
-#include <bits/stdc++.h>
-using namespace std;
+#include <iostream>
 
-string replaceN(string n, int index, string k=""){
-    k += n[0];
-    for (int i = 1; i<n.size(); i++){
-        if (i==index){
-            if (n[i]=='0'){
-                n[i]='1';
-            }
-            else {
-                n[i]='0';
-        
-            }
-        }
-        if (n[i]==n[i-1]){
-            continue;
-        }
-        k += n[i];
-        
-    }
-    return k;
+// gets tower height from user and returns it
+double getTowerHeight()
+{
+	std::cout << "Enter the height of the tower in meters: ";
+	double towerHeight{};
+	std::cin >> towerHeight;
+	return towerHeight;
 }
-int findN(string n){
-    int consecutive = 1;
-    set<string> seen;
-    seen.insert(replaceN(n, -1));
-    for (int i = 1; i<n.size(); i++){
-        if (n[i]==n[i-1]){
-            consecutive+=1;
-            if (consecutive ==3){
-                seen.insert(replaceN(n, i-1));
-            }
-            continue;
-        }
 
-        if(consecutive==1&&i>1){
-            seen.insert(replaceN(n, i-1));
-        }
-        consecutive = 1;
-        
-    }
-    return static_cast<int>(seen.size());
+// Returns ball height from ground after "seconds" seconds
+constexpr double calculateBallHeight(double towerHeight, int seconds)
+{
+	constexpr double gravity{ 9.8 };
+
+	// Using formula: [ s = u * t + (a * t^2) / 2 ], here u(initial velocity) = 0
+	const double distanceFallen{ (gravity * (seconds * seconds)) / 2.0 };
+	const double currentHeight{ towerHeight - distanceFallen };
+
+	return currentHeight;
 }
+
+// Prints ball height above ground
+void printBallHeight(double ballHeight, int seconds)
+{
+	if (ballHeight > 0.0)
+		std::cout << "At " << seconds << " seconds, the ball is at height: " << ballHeight << " meters\n";
+	else
+		std::cout << "At " << seconds << " seconds, the ball is on the ground.\n";
+}
+
+// Calculates the current ball height and then prints it
+// This is a helper function to make it easier to do this
+void printCalculatedBallHeight(double towerHeight, int seconds)
+{
+	const double ballHeight{ calculateBallHeight(towerHeight, seconds) };
+	printBallHeight(ballHeight, seconds);
+}
+
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+	const double towerHeight{ getTowerHeight() };
 
-    int t{1};
-    cin >> t;  
-    while (t--)
-    {
-        string n;
-        cin >> n;
-        cout << findN(n) << "!\n";
-        
-    }
+	printCalculatedBallHeight(towerHeight, 0);
+	printCalculatedBallHeight(towerHeight, 1);
+	printCalculatedBallHeight(towerHeight, 2);
+	printCalculatedBallHeight(towerHeight, 3);
+	printCalculatedBallHeight(towerHeight, 4);
+	printCalculatedBallHeight(towerHeight, 5);
+
+	return 0;
 }
